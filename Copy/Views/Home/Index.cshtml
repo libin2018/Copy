@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = "首页";
+}
+<div class="jumbotron">
+    <h1>共享文件</h1>
+    <p class="lead">限大小5M以内，支持：txt、doc、xls、jpg、png、xmind、rar、zip后缀文件!</p>
+    <p class="lead">共享的文件只存储在缓存中，且只保留24小时，仅能下载一次，下载后文件将自动删除！</p>
+    <div class="row" style="margin-top:20px;">
+        <div id="uploader_panel">
+            @Html.Partial("_UploadFile", new UploadModel() { ButtonName = "上传文件", ServerUrl = Url.Action("ImportData", "Home"), Extensions = ".txt,.doc,.docx,.xls,.xlsx,.jpg,.png,.xmind,.rar,.zip", CallBackFunction = "uploadCallBack" })
+        </div>
+    </div>
+    <div id="vueQRCode">
+        <div class="modal fade" id="modalQRCode" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width:350px;margin:30px auto;">
+                <div class="modal-content">
+                    <div class="modal-header bg-success">
+                        <button type="button" class="close m--font-light" data-dismiss="modal">×</button>
+                        <h4 class="modal-title m--font-light">共享二维码</h4>
+                    </div>
+                    <div class="modal-body" style="padding-bottom: 10px;">
+                        <div class="row loading" style="display: none">
+                            <div class="col-md-12">
+                                <div class="sk-three-bounce">
+                                    <div class="sk-child sk-bounce1"></div>
+                                    <div class="sk-child sk-bounce2"></div>
+                                    <div class="sk-child sk-bounce3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="qrcode" style="text-align:center; display:none;">
+                            <img src="" alt="共享二维码" width="300" height="300" />
+                            <div style="text-align:center; padding:10px 0px 5px 0px">
+                                {{file.fileName}} <a :download="file.fileName+'-共享二维码.png'" class="font-blue" :href="file.imgSrc">下载图片</a>
+                            </div>
+                        </div>
+                        <div id="econtract-error" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: "#vueQRCode",
+        data: {
+            file: { "imgSrc": "", "fileName": "" },
+            host: "http://" + window.location.host,
+        },
+        methods: {
+        }
+    });
+
+    function uploadCallBack(data) {
+        if (data.Result) {
+            alert("文件上传成功！");
+            var src = vm.host + '/api/Files/GetQrCode?url=' + vm.host + "/Home/Download?key=" + data.Entity.file_key;
+            $("#qrcode img").attr('src', src);
+            vm.file.imgSrc = src;
+            vm.file.fileName = data.Entity.file_name;
+            $("#qrcode").show();
+            $("#modalQRCode").modal("show");
+        } else {
+            var errorMessage = "";
+            $.each(data.ErrorMessages, function (index, item) {
+                if (errorMessage == "") {
+                    errorMessage += item;
+                } else {
+                    errorMessage += item + "\r\n";
+                }
+            });
+            alert(errorMessage);
+        }
+    }
+</script>

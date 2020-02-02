@@ -1,0 +1,136 @@
+﻿@model UploadModel
+<link rel="stylesheet" type="text/css" href="~/Themes/global/plugins/webUploader/uploader_n.css" />
+<link rel="stylesheet" type="text/css" href="~/Themes/global/plugins/webUploader/webuploader_n.css" />
+<link rel="stylesheet" type="text/css" href="~/Themes/global/plugins/webUploader/webuploaderDefaultStyle_n.css" />
+<script type="text/javascript" src="~/Themes/global/plugins/webUploader/webuploader.min.js"></script>
+<script type="text/javascript">
+    jQuery(function () {
+        var $ = jQuery,    // just in case. Make sure it's not an other libaray.
+
+            $list = $('#upload'),
+
+            $wrap = $('#uploader'),
+
+            // 图片容器
+            $queue = $('<ul class="filelist"></ul>')
+                .appendTo($wrap.find('.queueList')),
+
+            // 上传按钮
+            $upload = $wrap.find('.uploadBtn'),
+
+            // 没选择文件之前的内容。
+            $placeHolder = $wrap.find('.placeholder'),
+
+            // 可能有pedding, ready, uploading, confirm, done.
+            state = 'pedding',
+
+            // 所有文件的进度信息，key为file id
+            percentages = {},
+
+            supportTransition = (function () {
+                var s = document.createElement('p').style,
+                    r = 'transition' in s ||
+                          'WebkitTransition' in s ||
+                          'MozTransition' in s ||
+                          'msTransition' in s ||
+                          'OTransition' in s;
+                s = null;
+                return r;
+            })(),
+
+            // WebUploader实例
+            uploader;
+
+        if (!WebUploader.Uploader.support()) {
+            alert('Web Uploader 不支持您的浏览器！如果你使用的是IE浏览器，请尝试升级 flash 播放器');
+            throw new Error('WebUploader does not support the browser you are using.');
+        }
+
+        // 实例化
+        uploader = WebUploader.create({
+            auto: true,
+            pick: {
+                id: '#filePicker',
+                label: '点击上传文件'
+            },
+            dnd: '#uploader .queueList',
+            paste: document.body,
+
+            accept: {
+                title: 'excel',
+                mimeTypes: '@Model.Extensions'
+            },
+
+            // swf文件路径
+            swf: '@Url.Content("~/Styles/Uploader.swf")',
+
+            disableGlobalDnd: true,
+
+            chunked: true,
+            // 文件接收服务端。
+            server: '@Model.ServerUrl',
+
+            method: 'POST',
+        });
+
+        // 当有文件添加进来的时候
+        uploader.on('fileQueued', function (file) {
+            var $file = $('<div id="' + file.id + '" class="item" style="width:650px;height:60px;"></div>');
+
+            var top = ($(window).height() - $file.height()) / 2 - 50;
+            var left = ($(window).width() - $file.width()) / 2;
+            var scrollTop = $(document).scrollTop();
+            var scrollLeft = $(document).scrollLeft();
+            $file.css({ position: 'absolute', 'top': top + scrollTop, left: left + scrollLeft })
+
+            $list.append($file);
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $("#" + file.id), $percent = $li.find('.progress .progress-bar');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<div class="progress progress-striped active">' +
+                  '<div class="progress-bar" role="progressbar" style="width: 0%;height:50px;">' +
+                  '</div>' +
+                '</div>').appendTo($li).find('.progress-bar');
+            }
+
+            $li.find('p.state').text('上传中');
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        uploader.on('uploadSuccess', function (file, response) {
+            if ('@Model.CallBackFunction' != '') {
+                @string.Format("{0}(response)", Model.CallBackFunction)
+            }
+        });
+
+        uploader.on('uploadError', function (file) {
+            $('#' + file.id).find('span.state').text('上传出错');
+        });
+
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').fadeOut();
+        });
+
+        // 删除
+        $list.on("click", ".file-remove", function () {
+            var $file = $(this).parent();
+            uploader.removeFile($file.attr("id"));
+            $file.remove();
+        });
+    });
+</script>
+
+<div id="uploader" class="wu-example">
+    <div class="queueList">
+        <div id="dndArea" class="placeholder">
+            <div class="webuploader-container" id="filePicker"><div class="webuploader-pick">点击选择文件</div><div style="position: absolute; top: 0px; left: 448px; width: 168px; height: 44px; overflow: hidden; bottom: auto; right: auto;" id="rt_rt_1a79hpgrl1vn4dq15pe11ujv701"><input accept="image/*" multiple="multiple" class="webuploader-element-invisible" name="file" type="file"><label style="opacity: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: rgb(255, 255, 255) none repeat scroll 0% 0%;"></label></div></div>
+            <p>或将文件拖至虚线区域内。</p>
+        </div>
+        <ul class="filelist"></ul>
+    </div>
+</div>
