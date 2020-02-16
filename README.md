@@ -9,8 +9,6 @@
 
 ### 项目已部署，在线Demo
 - 本项目运行后效果：http://copy.wudikeji.cn
-- 本项目Swagger接口文档：http://copy.wudikeji.cn/swagger-ui.html
-- 实际综合应用商城项目：http://jq.wudikeji.cn/
 
 ### v1.1版本已发布！[立即获取源码和文档](http://copy.wudikeji.cn)
 - v1.1 复制URL地址
