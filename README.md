@@ -1,7 +1,7 @@
 
 # Copy匿名文件共享系统
 [![AUR](https://img.shields.io/badge/GPL-v3-red)](https://github.com/libin2018/Copy/blob/master/License)
-[![](https://img.shields.io/badge/Author-Exrick-orange.svg)](http://blog.wudikeji.cn)
+[![](http://copy.wudikeji.cn/fonts/Author-libin-orange.svg)](http://blog.wudikeji.cn)
 [![](https://img.shields.io/badge/version-1.0-brightgreen.svg)](https://github.com/libin2018/Copy)
 [![GitHub stars](https://img.shields.io/github/stars/libin2018/Copy.svg?style=social&label=Stars)](https://github.com/libin2018/Copy)
 [![GitHub forks](https://img.shields.io/github/forks/libin2018/Copy.svg?style=social&label=Fork)](https://github.com/libin2018/Copy)
